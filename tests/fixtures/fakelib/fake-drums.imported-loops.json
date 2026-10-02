@@ -1,0 +1,321 @@
+{
+ "schemaVersion": 1,
+ "source": "tests/gen_wavs.py (fake)",
+ "createdAt": "2026-09-13T12:00:00Z",
+ "bpm": 108.0,
+ "scale": "score/tight/loop are out of 10 and 10.0 is possible (the app's own 0.0\u20139.9 scale caps at 9.9); score = mean Loop of scored bars; tight = mean Tight; loop = weakest bar's Loop; ownPattern = same timing score against the variant's own figure",
+ "barConvention": "Pro Tools bars; song starts at bar 9; ptEnd is exclusive (End = last bar + 1)",
+ "loops": [
+  {
+   "id": "9-16",
+   "fileNameHint": "9-16.wav",
+   "folder": "8 bar loops",
+   "score": 8.4,
+   "tight": 8.6,
+   "loop": 7.0,
+   "ownPattern": null,
+   "notes": "Fake intro run: eight tight bars.",
+   "bars": 8,
+   "ptStart": 9,
+   "ptEnd": 17,
+   "barsInFile": 8.0,
+   "perBar": [
+    {
+     "bar": 9,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 10,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 11,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 12,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 13,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 14,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 15,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    },
+    {
+     "bar": 16,
+     "tight": 8.6,
+     "loop": 7.0,
+     "ownPattern": null
+    }
+   ],
+   "feelMs": 6.0,
+   "hats": "full",
+   "hatDb": -44.0,
+   "mixRmsDb": -24.0,
+   "section": "Vamp",
+   "act": "I",
+   "use": "backbone candidate",
+   "variant": null,
+   "fills": [],
+   "breaks": [],
+   "bassOutBars": [],
+   "melloOutBars": [],
+   "patternDepartures": [],
+   "join": "clean"
+  },
+  {
+   "id": "15-16",
+   "fileNameHint": "15-16.wav",
+   "folder": "2 bar loops",
+   "score": 9.6,
+   "tight": 9.8,
+   "loop": 9.5,
+   "ownPattern": null,
+   "notes": "Fake: the tight pair.",
+   "bars": 2,
+   "ptStart": 15,
+   "ptEnd": 17,
+   "barsInFile": 2.0,
+   "perBar": [
+    {
+     "bar": 15,
+     "tight": 9.8,
+     "loop": 9.5,
+     "ownPattern": null
+    },
+    {
+     "bar": 16,
+     "tight": 9.8,
+     "loop": 9.5,
+     "ownPattern": null
+    }
+   ],
+   "feelMs": 5.7,
+   "hats": "full",
+   "hatDb": -44.5,
+   "mixRmsDb": -24.5,
+   "section": "Vamp",
+   "act": "I",
+   "use": "drums-only texture (bass out)",
+   "variant": null,
+   "fills": [],
+   "breaks": [],
+   "bassOutBars": [
+    15,
+    16
+   ],
+   "melloOutBars": [],
+   "patternDepartures": [],
+   "join": "clean"
+  },
+  {
+   "id": "33-34",
+   "fileNameHint": "33-34.wav",
+   "folder": "2 bar loops",
+   "score": 7.2,
+   "tight": 7.5,
+   "loop": 6.5,
+   "ownPattern": null,
+   "notes": "Fake: lazy pair, 18 ms behind.",
+   "bars": 2,
+   "ptStart": 33,
+   "ptEnd": 35,
+   "barsInFile": 2.0,
+   "perBar": [
+    {
+     "bar": 33,
+     "tight": 7.5,
+     "loop": 6.5,
+     "ownPattern": null
+    },
+    {
+     "bar": 34,
+     "tight": 7.5,
+     "loop": 6.5,
+     "ownPattern": null
+    }
+   ],
+   "feelMs": 23.7,
+   "hats": "full",
+   "hatDb": -44.2,
+   "mixRmsDb": -24.3,
+   "section": "Bass in",
+   "act": "I",
+   "use": "variation (lazy pocket)",
+   "variant": "lazy pocket: core hits 18 ms behind",
+   "fills": [],
+   "breaks": [],
+   "bassOutBars": [],
+   "melloOutBars": [],
+   "patternDepartures": [],
+   "join": "clean"
+  },
+  {
+   "id": "33-36",
+   "fileNameHint": "33-36.wav",
+   "folder": "4 bar loops",
+   "score": 9.1,
+   "tight": 9.3,
+   "loop": 8.5,
+   "ownPattern": null,
+   "notes": "Fake: four tight bars over the bass.",
+   "bars": 4,
+   "ptStart": 33,
+   "ptEnd": 37,
+   "barsInFile": 4.0,
+   "perBar": [
+    {
+     "bar": 33,
+     "tight": 9.3,
+     "loop": 8.5,
+     "ownPattern": null
+    },
+    {
+     "bar": 34,
+     "tight": 9.3,
+     "loop": 8.5,
+     "ownPattern": null
+    },
+    {
+     "bar": 35,
+     "tight": 9.3,
+     "loop": 8.5,
+     "ownPattern": null
+    },
+    {
+     "bar": 36,
+     "tight": 9.3,
+     "loop": 8.5,
+     "ownPattern": null
+    }
+   ],
+   "feelMs": 5.9,
+   "hats": "full",
+   "hatDb": -44.3,
+   "mixRmsDb": -24.4,
+   "section": "Bass in",
+   "act": "I",
+   "use": "backbone candidate",
+   "variant": null,
+   "fills": [],
+   "breaks": [],
+   "bassOutBars": [],
+   "melloOutBars": [],
+   "patternDepartures": [],
+   "join": "clean"
+  },
+  {
+   "id": "101-104",
+   "fileNameHint": "101-104.wav",
+   "folder": "4 bar loops",
+   "score": null,
+   "tight": 6.0,
+   "loop": 5.0,
+   "ownPattern": 9.4,
+   "notes": "Fake variant: light hats, own pattern 9.4.",
+   "bars": 4,
+   "ptStart": 101,
+   "ptEnd": 105,
+   "barsInFile": 4.0,
+   "perBar": [
+    {
+     "bar": 101,
+     "tight": 6.0,
+     "loop": 5.0,
+     "ownPattern": 9.4
+    },
+    {
+     "bar": 102,
+     "tight": 6.0,
+     "loop": 5.0,
+     "ownPattern": 9.4
+    },
+    {
+     "bar": 103,
+     "tight": 6.0,
+     "loop": 5.0,
+     "ownPattern": 9.4
+    },
+    {
+     "bar": 104,
+     "tight": 6.0,
+     "loop": 5.0,
+     "ownPattern": 9.4
+    }
+   ],
+   "feelMs": 5.8,
+   "hats": "light",
+   "hatDb": -52.0,
+   "mixRmsDb": -25.0,
+   "section": "Riddim I",
+   "act": "II",
+   "use": "variation (clave snare (1a, 2&, 4))",
+   "variant": "clave snare (1a, 2&, 4)",
+   "fills": [],
+   "breaks": [],
+   "bassOutBars": [],
+   "melloOutBars": [],
+   "patternDepartures": [],
+   "join": "clean"
+  },
+  {
+   "id": "324-324",
+   "fileNameHint": "324 (fill into the break).wav",
+   "folder": "Events",
+   "score": null,
+   "tight": 4.0,
+   "loop": 4.0,
+   "ownPattern": 5.5,
+   "notes": "Fake fill into the break.",
+   "bars": 1,
+   "ptStart": 324,
+   "ptEnd": 325,
+   "barsInFile": 1.0,
+   "perBar": [
+    {
+     "bar": 324,
+     "tight": 4.0,
+     "loop": 4.0,
+     "ownPattern": 5.5
+    }
+   ],
+   "feelMs": 40.0,
+   "hats": "medium",
+   "hatDb": -47.0,
+   "mixRmsDb": -23.0,
+   "section": "BREAK",
+   "act": "IV",
+   "use": "event / punctuation",
+   "variant": null,
+   "fills": [
+    324
+   ],
+   "breaks": [],
+   "bassOutBars": [],
+   "melloOutBars": [],
+   "patternDepartures": [],
+   "join": "clean"
+  }
+ ]
+}

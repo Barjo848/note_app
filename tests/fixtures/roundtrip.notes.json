@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "app": {
+    "name": "Note",
+    "version": "1.0.0"
+  },
+  "track": {
+    "fileName": "synth_10min_48k_st24.wav",
+    "fingerprint": "98f8b586467d30de08b95073a58bb2a45459c25a987be48a49815a6a902242a4",
+    "sizeBytes": 172800044,
+    "durationSeconds": 600,
+    "sampleRate": 48000,
+    "channels": 2,
+    "bitDepth": 24,
+    "format": "pcm",
+    "myCustomTrack": "yes"
+  },
+  "grid": {
+    "bpm": 108,
+    "meterNumerator": 4,
+    "meterDenominator": 4,
+    "bar1OffsetSeconds": 0,
+    "ticksPerQuarter": 960
+  },
+  "settings": {
+    "categories": [
+      "structure",
+      "drums",
+      "bass",
+      "mix",
+      "fx",
+      "idea",
+      "fix",
+      "loop",
+      "fill",
+      "reference"
+    ],
+    "categoryColors": {
+      "structure": "#7c9cff",
+      "drums": "#ff7a59",
+      "bass": "#c084fc",
+      "mix": "#5ad1c8",
+      "fx": "#f0c34f",
+      "idea": "#8ee66b",
+      "fix": "#ff5d8f",
+      "loop": "#4fb8ff",
+      "fill": "#ffa552",
+      "reference": "#b0b8c8"
+    },
+    "snap": "bar"
+  },
+  "layers": [
+    {
+      "id": "L_muqr1fh23a092e498d23",
+      "name": "Notes",
+      "kind": "human",
+      "color": "#3fb0ff",
+      "visible": true,
+      "createdAt": "2026-10-02T09:16:57.110Z",
+      "myCustomLayer": "L"
+    },
+    {
+      "id": "L_muqr1fh2f3b840da3495",
+      "name": "AI v0",
+      "kind": "ai",
+      "color": "#ffb03f",
+      "visible": true,
+      "createdAt": "2026-10-02T09:16:57.110Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "n_muqr1fh27444b4a8ff85",
+      "layerId": "L_muqr1fh23a092e498d23",
+      "type": "pin",
+      "start": {
+        "samples": 4266672,
+        "seconds": 88.889
+      },
+      "end": null,
+      "title": "big fill",
+      "body": "6 tom hits",
+      "category": "fill",
+      "tags": [
+        "keep"
+      ],
+      "color": null,
+      "rating": 5,
+      "status": "open",
+      "createdAt": "2026-10-02T09:16:57.110Z",
+      "updatedAt": "2026-10-02T09:16:57.110Z",
+      "replies": [
+        {
+          "id": "r_muqr1fh219cd5f338a83",
+          "layerId": "L_muqr1fh2f3b840da3495",
+          "body": "Agree; strongest fill.",
+          "createdAt": "2026-10-02T09:16:57.110Z",
+          "myCustomReply": "R"
+        }
+      ],
+      "myCustomNote": 42
+    },
+    {
+      "id": "n_muqr1fh2269843094b69",
+      "layerId": "L_muqr1fh23a092e498d23",
+      "type": "interval",
+      "start": {
+        "samples": 6720000,
+        "seconds": 140
+      },
+      "end": {
+        "samples": 8640000,
+        "seconds": 180
+      },
+      "title": "loop candidate 8 bars",
+      "body": "",
+      "category": "loop",
+      "tags": [],
+      "color": null,
+      "rating": 4,
+      "status": "done",
+      "createdAt": "2026-10-02T09:16:57.110Z",
+      "updatedAt": "2026-10-02T09:16:57.110Z",
+      "replies": []
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-09-01T00:00:00Z",
+      "event": "relinked",
+      "from": "x_v1.wav",
+      "to": "x_v2.wav",
+      "offsetSeconds": 0
+    }
+  ],
+  "myCustomTop": {
+    "keep": true
+  }
+}

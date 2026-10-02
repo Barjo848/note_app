@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "source": "imported sidecar",
+  "createdAt": "2026-09-13T12:00:00Z",
+  "bpm": 108,
+  "signature": {
+    "kick": {
+      "0": -0.2,
+      "2": -5.9,
+      "8": -0.1
+    },
+    "hat": {
+      "0": 4,
+      "2": -6,
+      "6": -0.3,
+      "8": -0.1,
+      "10": -0.1,
+      "14": -0.4
+    },
+    "snare": {
+      "4": -0.6,
+      "11": 24,
+      "12": 0.3
+    }
+  },
+  "loops": [
+    {
+      "id": "tight",
+      "fileNameHint": "tight.wav",
+      "score": 9.8,
+      "tight": 10,
+      "loop": 9.8,
+      "notes": "Stem-accurate: every hit within 2 ms of the signature; join clean.",
+      "hits": [
+        {
+          "drum": "kick",
+          "bar": 1,
+          "pos": 0,
+          "tSeconds": 0,
+          "devMs": 0,
+          "residualMs": 0.2,
+          "levelDb": -9.4,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 1,
+          "pos": 0,
+          "tSeconds": 0.004,
+          "devMs": 4,
+          "residualMs": 0,
+          "levelDb": -29.4,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 1,
+          "pos": 2,
+          "tSeconds": 0.271,
+          "devMs": -6.8,
+          "residualMs": -0.8,
+          "levelDb": -31.5,
+          "class": "tight"
+        },
+        {
+          "drum": "kick",
+          "bar": 1,
+          "pos": 2,
+          "tSeconds": 0.272,
+          "devMs": -5.8,
+          "residualMs": 0.1,
+          "levelDb": -9.4,
+          "class": "tight"
+        },
+        {
+          "drum": "snare",
+          "bar": 1,
+          "pos": 4,
+          "tSeconds": 0.555,
+          "devMs": -0.6,
+          "residualMs": 0,
+          "levelDb": -16.7,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 1,
+          "pos": 6,
+          "tSeconds": 0.833,
+          "devMs": -0.3,
+          "residualMs": 0,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "kick",
+          "bar": 1,
+          "pos": 8,
+          "tSeconds": 1.111,
+          "devMs": -0.1,
+          "residualMs": 0,
+          "levelDb": -9.4,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 1,
+          "pos": 8,
+          "tSeconds": 1.111,
+          "devMs": -0.1,
+          "residualMs": 0,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 1,
+          "pos": 10,
+          "tSeconds": 1.388,
+          "devMs": -0.9,
+          "residualMs": -0.8,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "snare",
+          "bar": 1,
+          "pos": 11,
+          "tSeconds": 1.551,
+          "devMs": 23.2,
+          "residualMs": -0.8,
+          "levelDb": -16.8,
+          "class": "feel"
+        },
+        {
+          "drum": "snare",
+          "bar": 1,
+          "pos": 12,
+          "tSeconds": 1.667,
+          "devMs": 0.3,
+          "residualMs": 0,
+          "levelDb": -16.5,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 1,
+          "pos": 14,
+          "tSeconds": 1.944,
+          "devMs": -0.4,
+          "residualMs": 0,
+          "levelDb": -31.5,
+          "class": "tight"
+        },
+        {
+          "drum": "kick",
+          "bar": 2,
+          "pos": 0,
+          "tSeconds": 2.222,
+          "devMs": -0.2,
+          "residualMs": 0,
+          "levelDb": -9.4,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 2,
+          "pos": 0,
+          "tSeconds": 2.222,
+          "devMs": -0.2,
+          "residualMs": -4.2,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "kick",
+          "bar": 2,
+          "pos": 2,
+          "tSeconds": 2.494,
+          "devMs": -6,
+          "residualMs": -0.1,
+          "levelDb": -9.4,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 2,
+          "pos": 2,
+          "tSeconds": 2.494,
+          "devMs": -6,
+          "residualMs": 0,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "snare",
+          "bar": 2,
+          "pos": 4,
+          "tSeconds": 2.777,
+          "devMs": -0.8,
+          "residualMs": -0.2,
+          "levelDb": -16.8,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 2,
+          "pos": 6,
+          "tSeconds": 3.055,
+          "devMs": -0.6,
+          "residualMs": -0.3,
+          "levelDb": -31.5,
+          "class": "tight"
+        },
+        {
+          "drum": "kick",
+          "bar": 2,
+          "pos": 8,
+          "tSeconds": 3.333,
+          "devMs": -0.3,
+          "residualMs": -0.2,
+          "levelDb": -9.4,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 2,
+          "pos": 8,
+          "tSeconds": 3.333,
+          "devMs": -0.3,
+          "residualMs": -0.2,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 2,
+          "pos": 10,
+          "tSeconds": 3.611,
+          "devMs": -0.1,
+          "residualMs": 0,
+          "levelDb": -31.6,
+          "class": "tight"
+        },
+        {
+          "drum": "snare",
+          "bar": 2,
+          "pos": 11,
+          "tSeconds": 3.774,
+          "devMs": 24,
+          "residualMs": 0,
+          "levelDb": -16.6,
+          "class": "feel"
+        },
+        {
+          "drum": "snare",
+          "bar": 2,
+          "pos": 12,
+          "tSeconds": 3.889,
+          "devMs": 0.1,
+          "residualMs": -0.2,
+          "levelDb": -16.6,
+          "class": "tight"
+        },
+        {
+          "drum": "hat",
+          "bar": 2,
+          "pos": 14,
+          "tSeconds": 4.166,
+          "devMs": -0.7,
+          "residualMs": -0.3,
+          "levelDb": -31.4,
+          "class": "tight"
+        }
+      ],
+      "missing": []
+    },
+    {
+      "id": "feel",
+      "fileNameHint": "feel.wav",
+      "score": 8.9,
+      "tight": 8,
+      "loop": 9.8,
+      "notes": "Snares +18 ms and hats +12 ms behind the click throughout — laid back, consistent, no mistakes.",
+      "hits": [],
+      "missing": []
+    },
+    {
+      "id": "mistakes",
+      "fileNameHint": "mistakes.wav",
+      "score": 4.5,
+      "tight": 4,
+      "loop": 5,
+      "notes": "Late snare on beat 2 (+45 ms), a kick flam on 3, a missing kick in bar 2 and a 9 dB weak snare.",
+      "hits": [
+        {
+          "drum": "snare",
+          "bar": 1,
+          "pos": 4,
+          "tSeconds": 0.601,
+          "devMs": 45.4,
+          "residualMs": 46,
+          "levelDb": -16.6,
+          "class": "mistake"
+        }
+      ],
+      "missing": [
+        {
+          "drum": "kick",
+          "bar": 2,
+          "pos": 8
+        }
+      ]
+    },
+    {
+      "id": "pushed",
+      "fileNameHint": "pushed.wav",
+      "score": 7.2,
+      "tight": 9.5,
+      "loop": 5,
+      "notes": "Pushed downbeat kick sits 10 ms before the loop end; the cut needs to move.",
+      "hits": [],
+      "missing": []
+    }
+  ]
+}

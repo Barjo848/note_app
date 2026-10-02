@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: data:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://api.anthropic.com; worker-src blob:; font-src 'self' data:;">
+<title>Note</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="toolbar" role="toolbar" aria-label="File and tools">
+  <div class="group">
+    <span class="brand" title="Note">▮▮▮ Note</span>
+    <div class="mode-switch" role="tablist" aria-label="Mode"><button id="btnModeTrack" role="tab" class="active" aria-selected="true">Track</button><button id="btnModeLoops" role="tab" aria-selected="false">Loop Lab</button></div>
+    <button id="btnOpen" data-track-only title="Open WAV (⌘O)">Open WAV</button>
+    <button id="btnLoadNotes" data-track-only title="Load notes JSON (⇧⌘O)">Load notes</button>
+    <button id="btnSave" data-track-only class="primary" title="Save notes (⌘S)">Save</button>
+    <button id="btnSaveAs" data-track-only title="Save notes to a new file">Save as…</button>
+    <span id="dirty" class="dirty track-only" title="Unsaved changes" hidden>● unsaved</span>
+    <span id="saveTarget" class="muted small track-only"></span>
+  </div>
+  <div class="group">
+    <button id="btnUndo" data-track-only title="Undo (⌘Z)" disabled>Undo</button>
+    <button id="btnRedo" data-track-only title="Redo (⇧⌘Z)" disabled>Redo</button>
+    <div class="menu track-only">
+      <button id="btnExportMenu" aria-haspopup="true" aria-expanded="false">Export ▾</button>
+      <div class="menu-items" role="menu">
+        <button id="btnExportMd" role="menuitem">Markdown report</button>
+        <button id="btnExportCsv" role="menuitem">CSV markers (Pro Tools)</button>
+        <button id="btnExportAi" role="menuitem">AI bundle (.ai-request.md)</button>
+        <hr>
+        <button id="btnImportAi" role="menuitem">Import AI response (.json)…</button>
+        <button id="btnAskAi" role="menuitem">Ask AI directly…</button>
+      </div>
+    </div>
+    <button id="btnRelink" data-track-only title="Open a new bounce and keep the current notes">Re-link WAV…</button>
+    <button id="btnSettings" title="Settings">Settings</button>
+    <button id="btnHelp" title="Keyboard shortcuts (?)">?</button>
+  </div>
+</header>
+
+<div id="trackInfo" class="trackinfo muted track-only">No file loaded.</div>
+<div id="progress" class="progress track-only" hidden><div class="bar"><div id="progressFill" class="fill"></div></div><span id="progressLabel" class="label"></span><button id="progressCancel" class="tiny">Cancel</button></div>
+<div id="banner" class="banner" hidden></div>
+
+<main class="workspace track-only">
+  <section class="wave-col" id="waveCol">
+    <canvas id="overview" class="overview" aria-label="Track overview"></canvas>
+    <canvas id="ruler" class="ruler" aria-label="Time and bar ruler"></canvas>
+    <div id="mainWrap" class="main-wrap">
+      <canvas id="main" class="main" tabindex="0" aria-label="Waveform. Click to seek, shift-drag to select, double-click to add a pin note."></canvas>
+      <div id="tooltip" class="tooltip" hidden></div>
+    </div>
+    <div class="viewbar">
+      <div class="group">
+        <button id="btnZoomOut" title="Zoom out (−)">−</button>
+        <button id="btnZoomIn" title="Zoom in (+)">+</button>
+        <button id="btnZoomFit" title="Fit whole track (0)">Fit</button>
+        <button id="btnCenter" title="Centre on playhead (F)">Centre</button>
+        <label class="check"><input type="checkbox" id="chkFollow" checked> Follow</label>
+      </div>
+      <div class="group">
+        <label class="check"><input type="checkbox" id="chkSplit" checked> Stereo split</label>
+        <label class="check"><input type="checkbox" id="chkGrid" checked> Grid lines <kbd>G</kbd></label>
+        <label class="check"><input type="checkbox" id="chkSnap"> Snap <kbd>S</kbd></label>
+        <select id="selSnap" title="Snap resolution"><option value="bar">bar</option><option value="beat">beat</option><option value="8th">8th</option><option value="16th">16th</option></select>
+        <label class="check"><input type="checkbox" id="chkAnalysis"> Analysis <kbd>A</kbd></label>
+      </div>
+    </div>
+    <div class="transport" role="group" aria-label="Transport">
+      <button id="btnHome" title="Jump to start (Home)" aria-label="Jump to start">⏮</button>
+      <button id="btnPlay" class="play" title="Play / pause (Space)" aria-label="Play or pause" aria-pressed="false">▶</button>
+      <button id="btnStop" title="Stop and return (Enter)" aria-label="Stop and return">■</button>
+      <button id="btnPrevNote" title="Previous note ([)" aria-label="Previous note">◀︎●</button>
+      <button id="btnNextNote" title="Next note (])" aria-label="Next note">●▶︎</button>
+      <button id="btnLoop" title="Loop selection or note (L)" aria-label="Loop" aria-pressed="false">Loop</button>
+      <div class="readout" aria-live="off">
+        <span id="timeNow" class="time">00:00.000</span>
+        <span id="bbtNow" class="bbt"></span>
+        <span id="timeRest" class="muted small"></span>
+      </div>
+      <label class="small">Rate <select id="selRate"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.1">1.1×</option><option value="1.25">1.25×</option></select></label>
+      <label class="small">Vol <input type="range" id="rngVolume" min="0" max="1" step="0.01" value="1" aria-label="Volume"></label>
+      <div class="group note-actions">
+        <button id="btnAddPin" title="Pin at playhead (M)">+ Pin</button>
+        <button id="btnAddInterval" title="Interval from selection (⇧M)">+ Interval</button>
+        <button id="btnSetIn" title="Selection in point (I)">In</button>
+        <button id="btnSetOut" title="Selection out point (O)">Out</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="sidebar" id="sidebar">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="notes" class="active" aria-selected="true">Notes <span id="noteCount" class="count"></span></button>
+      <button role="tab" data-tab="layers" aria-selected="false">Layers</button>
+      <button role="tab" data-tab="grid" aria-selected="false">Grid</button>
+      <button role="tab" data-tab="editor" aria-selected="false">Editor</button>
+      <button role="tab" data-tab="ai" aria-selected="false">AI</button>
+    </nav>
+
+    <div class="panel" id="tab-notes" role="tabpanel">
+      <div class="filters">
+        <select id="fltLayer" title="Filter by layer"><option value="">All layers</option></select>
+        <select id="fltCategory" title="Filter by category"><option value="">All categories</option></select>
+        <select id="fltStatus" title="Filter by status"><option value="">Any status</option><option value="open">open</option><option value="done">done</option><option value="wontfix">wontfix</option></select>
+        <select id="fltSort" title="Sort"><option value="time">By time</option><option value="created">By creation</option></select>
+        <input type="search" id="fltSearch" placeholder="Search notes…" aria-label="Search notes">
+      </div>
+      <div id="noteList" class="note-list" role="listbox" aria-label="Notes"></div>
+    </div>
+
+    <div class="panel" id="tab-layers" role="tabpanel" hidden>
+      <div id="layerList" class="layer-list"></div>
+      <div class="row"><button id="btnAddLayer">+ Add layer</button></div>
+      <p class="muted small">New notes go to the active layer (radio). Hidden layers do not draw or list.</p>
+    </div>
+
+    <div class="panel" id="tab-grid" role="tabpanel" hidden>
+      <label class="check"><input type="checkbox" id="gridEnabled" checked> Tempo grid enabled</label>
+      <div class="form">
+        <label>BPM <input type="number" id="gridBpm" step="0.01" min="20" max="400" value="108"></label>
+        <label>Meter <span class="meter"><input type="number" id="gridNum" min="1" max="32" value="4"> / <select id="gridDen"><option>1</option><option>2</option><option value="4" selected>4</option><option>8</option><option>16</option></select></span></label>
+        <label>Bar 1 offset (s) <input type="text" id="gridOffset" value="0" inputmode="decimal"></label>
+      </div>
+      <div class="row">
+        <button id="btnBar1Here" title="Bar 1 starts at the playhead">Bar 1 = here</button>
+        <button id="btnTap" title="Click on a downbeat while playing; the nearest bar line moves there">Tap downbeat</button>
+      </div>
+      <p class="muted small">Ticks per quarter note: 960. Bar|beat|ticks appear in the ruler, the readout and the note list once the grid is on.</p>
+      <div id="gridInfo" class="muted small"></div>
+    </div>
+
+    <div class="panel" id="tab-editor" role="tabpanel" hidden>
+      <form id="editor" class="editor" autocomplete="off">
+        <div id="edEmpty" class="muted">Select a note (click a flag or band, or a row in the list) and press Enter, or double-click it.</div>
+        <div id="edFields" hidden>
+          <div class="ed-head"><span id="edType" class="pill"></span> <span id="edWhen" class="muted small"></span></div>
+          <label>Title <input type="text" id="edTitle" maxlength="200" placeholder="short label shown on the waveform"></label>
+          <label>Body <textarea id="edBody" rows="5" placeholder="details (⌘⏎ to save)"></textarea></label>
+          <div class="grid2">
+            <label>Category <select id="edCategory"></select></label>
+            <label>Layer <select id="edLayer"></select></label>
+            <label>Status <select id="edStatus"><option value="open">open</option><option value="done">done</option><option value="wontfix">wontfix</option></select></label>
+            <label>Rating <select id="edRating"><option value="">—</option><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option><option value="4">★★★★</option><option value="5">★★★★★</option></select></label>
+            <label>Start <input type="text" id="edStart" placeholder="mm:ss.mmm or bar|beat|ticks"></label>
+            <label id="edEndWrap">End <input type="text" id="edEnd" placeholder="mm:ss.mmm or bar|beat|ticks"></label>
+          </div>
+          <label>Tags <input type="text" id="edTags" placeholder="comma separated"></label>
+          <label class="colour-row">Colour <input type="color" id="edColor" value="#3fb0ff"> <label class="check"><input type="checkbox" id="edColorAuto" checked> from category</label></label>
+          <div class="row">
+            <button type="submit" id="edSave" class="primary" title="Save (Enter)">Save</button>
+            <button type="button" id="edCancel" title="Cancel (Esc)">Cancel</button>
+            <button type="button" id="edGoto" title="Seek to note">Go to</button>
+            <button type="button" id="edLoopNote" title="Loop this interval">Loop</button>
+            <button type="button" id="edDelete" class="danger" title="Delete (⌫)">Delete</button>
+          </div>
+          <div class="replies">
+            <h4>Replies</h4>
+            <div id="edReplies"></div>
+            <div class="row">
+              <textarea id="edReplyBody" rows="2" placeholder="Add a reply…"></textarea>
+              <select id="edReplyLayer" title="Reply as layer"></select>
+              <button type="button" id="edReplyAdd">Reply</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel" id="tab-ai" role="tabpanel" hidden>
+      <h4>Copy-paste workflow (no key needed)</h4>
+      <div class="row"><button id="btnExportAi2">Export AI bundle</button><button id="btnImportAi2">Import AI response file…</button></div>
+      <label>…or paste the model's JSON reply here <textarea id="aiPaste" rows="5" placeholder='{"layerName": "AI v1", "summary": "...", "replies": [], "notes": []}'></textarea></label>
+      <div class="row"><button id="btnImportPasted" class="primary">Import pasted response</button></div>
+      <h4>Direct request (optional)</h4>
+      <p class="muted small">Sends the same text bundle to the Anthropic Messages API from this browser. Needs an API key in Settings. Never sends audio.</p>
+      <div class="row"><button id="btnAskAi2">Ask AI now</button><span id="aiStatus" class="small muted"></span></div>
+      <h4>AI layer summaries</h4>
+      <div id="aiSummaries" class="muted small">No AI layers yet.</div>
+      <div id="aiReport" class="ai-report" hidden></div>
+    </div>
+  </aside>
+</main>
+
+
+<section id="loopLab" class="lab" hidden>
+  <div class="lab-toolbar">
+    <div class="group">
+      <div class="mode-switch" role="tablist" aria-label="Loop Lab view"><button id="lbViewLibrary" role="tab" class="active" aria-selected="true">Library</button><button id="lbViewSequence" role="tab" aria-selected="false">Sequence</button></div>
+      <button id="lbOpenFiles" title="Open one or more loop WAVs (⌘O)">Open loops…</button>
+      <button id="lbOpenFolder" title="Open a folder of loops (Chrome, http://)">Open folder…</button>
+      <button id="lbLoadJson" title="Load a loops.json (⇧⌘O)">Load loops.json</button>
+      <button id="lbSave" class="primary" title="Save loops.json (⌘S)">Save</button>
+      <button id="lbSaveAs">Save as…</button>
+      <span id="lbDirty" class="dirty" hidden>● unsaved</span><span id="lbSaveTarget" class="muted small"></span>
+      <div class="menu"><button id="lbExportMenu">Export ▾</button><div class="menu-items" role="menu"><button id="lbExportMd">Markdown ranking (.loops.md)</button><button id="lbExportCsv">CSV ranking (.loops.csv)</button><hr><button id="lbImportSidecar">Import ratings sidecar…</button></div></div>
+    </div>
+    <div class="group">
+      <label class="small">Session <input type="text" id="lbName" placeholder="session name" style="width:150px"></label>
+      <label class="small">BPM <input type="number" id="lbBpm" value="108" step="0.01" min="20" max="400" style="width:70px"></label>
+      <label class="small">Meter <input type="number" id="lbNum" value="4" min="1" max="32" style="width:44px"> / <select id="lbDen"><option>1</option><option>2</option><option value="4" selected>4</option><option>8</option><option>16</option></select></label>
+      <label class="small">Source <input type="text" id="lbSourceNote" placeholder="loops start on bar 1 beat 1" style="width:180px"></label>
+      <button id="lbSettings" title="Thresholds, core hits, band floors">Analysis settings</button>
+      <button id="lbHelp" title="Shortcuts (?)">?</button>
+    </div>
+    <div class="group reveal-group">
+      <span id="lbRatedCount" class="small muted"></span>
+      <label class="small" title="Imported ratings and the machine score stay hidden until you choose. The waveform marks stay. Never persisted.">Reveal <select id="lbRevealMode"><option value="hidden">Hidden</option><option value="rated">After I rate</option><option value="all">All</option></select></label>
+      <button id="lbExportRatings" title="Export my ratings (⌘E): JSON + CSV">Export ratings</button>
+      <label class="check small" title="Only possible when revealed"><input type="checkbox" id="lbIncludeCmp"> include comparison</label>
+      <button id="lbImportRatings" class="tiny" title="Restore ratings from an exported ratings file">import ratings…</button>
+    </div>
+  </div>
+  <canvas id="lbStrip" class="song-strip" aria-label="Song map: every loop at its Pro Tools bar; drag to filter a bar range"></canvas>
+  <div id="lbProgress" class="progress" hidden><div class="bar"><div id="lbProgressFill" class="fill"></div></div><span id="lbProgressLabel" class="label"></span></div>
+  <div class="lab-body">
+    <div class="lab-library">
+      <div class="lab-filter"><input type="search" id="lbFilter" placeholder="Filter by name, tag, note, section…" aria-label="Filter loops"><span id="lbCount" class="muted small"></span></div>
+      <div class="lab-sort row small">
+        <label>sort <select id="lbSortKey"></select></label><button id="lbSortDir" class="tiny" title="direction">▼</button><select id="lbSortSecondary" title="secondary key"></select>
+        <label class="check"><input type="checkbox" id="lbUnratedFirst"> unrated first</label><label class="check"><input type="checkbox" id="lbGroup"> group by section</label>
+        <label title="seed for the random order">seed <input type="text" id="lbSeed" style="width:60px"></label>
+      </div>
+      <div id="lbSimPanel" class="lab-sim row small" hidden>
+        <span>ref <b id="lbRefName">—</b></span><button id="lbSetRef" class="tiny" title="R">set = selected</button><button id="lbClearRef" class="tiny">clear</button>
+        <select id="lbSimPreset"><option value="all">all</option><option value="pattern">pattern</option><option value="feel">feel</option><option value="sound">sound</option><option value="custom">custom</option></select>
+        <label>p <input type="range" id="lbW_pattern" min="0" max="1" step="0.1" value="1" style="width:50px"></label><label>f <input type="range" id="lbW_feel" min="0" max="1" step="0.1" value="1" style="width:50px"></label><label>s <input type="range" id="lbW_sound" min="0" max="1" step="0.1" value="1" style="width:50px"></label>
+        <select id="lbSimSection"></select>
+      </div>
+      <div class="lab-chips row small"><div id="lbChips" class="chips"></div><select id="lbFilterSection"></select><select id="lbFilterUse"></select><label>mine ≥ <input type="number" id="lbRatingMin" min="0" max="9.9" step="0.1" style="width:56px"></label><label id="lbClaudeMinWrap" hidden>imported ≥ <input type="number" id="lbClaudeMin" min="0" max="10" step="0.1" style="width:56px"></label><button id="lbClearFilters" class="tiny">clear</button></div>
+      <div class="lab-table-wrap"><table id="lbTable" class="lab-table"><thead><tr>
+        <th class="num">#</th><th data-sort="position" data-label="loop">loop</th><th data-sort="position" data-label="PT" class="num" title="Pro Tools bars">PT</th><th data-sort="length" data-label="len" class="num">len</th><th data-sort="section" data-label="section" class="sec">section</th><th data-sort="hats" data-label="hats" title="hats: light / medium / full">hats</th><th data-label="bass" title="bass in / out">bass</th><th data-sort="rating" data-label="mine" class="num" title="my rating (0.0–9.9)">mine</th><th data-label="class" title="my class">class</th><th data-sort="listens" data-label="plays" class="num" title="play count">plays</th><th data-label="✗" class="num" title="mistake count">✗</th><th data-sort="feel" data-label="feel" class="num" title="feel: core hits vs grid, ms">feel</th><th id="lbThClaude" data-sort="claude" data-label="imported" class="num" hidden title="Imported rating /10 (* = own-pattern)">imported</th><th id="lbThWeak" data-sort="weakest" data-label="weak" class="num" hidden title="Imported weakest bar">weak</th><th id="lbThMachine" data-sort="machine" data-label="machine" class="num" hidden title="machine score">machine</th><th id="lbThSim" data-sort="similarity" data-label="dist" class="num" hidden title="distance to the reference">dist</th><th data-label="tags">tags</th>
+      </tr></thead><tbody></tbody></table></div>
+      <p class="muted small">Click a row to select, double-click or Enter to play. Type two digits + <kbd>Enter</kbd> to rate and move on; <kbd>N</kbd>/<kbd>P</kbd> next/previous, <kbd>U</kbd> next unrated, <kbd>S</kbd> skip, <kbd>R</kbd> reference.</p>
+    </div>
+    <div class="lab-detail" id="lbDetail">
+      <div id="lbDetailEmpty" class="muted">Open loops to start. Drop .wav files anywhere; files named <code>&lt;loop&gt;_KICK.wav</code> / <code>_SNARE.wav</code> / <code>_HIHAT.wav</code> are used as stems.</div>
+      <div id="lbDetailBody" hidden>
+        <form id="lbRatingForm" class="lab-rating" autocomplete="off">
+          <div class="row">
+            <label class="small">id <input type="text" id="lbLoopId" style="width:90px"></label>
+            <span id="lbLoopFile" class="muted small"></span><span id="lbLoopMeta" class="small meta"></span>
+            <label class="small" title="samples to bar 1 beat 1 inside the file">offset <input type="number" id="lbLoopOffset" value="0" step="1" style="width:80px"></label>
+          </div>
+          <div class="row">
+            <span class="small">my rating</span>
+            <select id="lbRatingWhole" aria-label="rating whole digit"><option value="">–</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select><b>.</b>
+            <select id="lbRatingTenth" aria-label="rating tenth digit"><option value="">–</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select>
+            <input type="range" id="lbRatingSlider" min="0" max="9.9" step="0.1" value="0" aria-label="rating slider" style="width:140px">
+            <select id="lbMyClass" title="my class by ear"><option value="">class…</option><option value="tight">tight</option><option value="feel">feel</option><option value="mistake">mistake</option></select>
+            <label class="small">tags <input type="text" id="lbTags" placeholder="keep, feel" style="width:140px"></label>
+            <button type="submit" class="primary" title="Save rating and notes (Enter)">Save rating</button>
+            <button type="button" id="lbSkip" class="tiny" title="S">skip</button><button type="button" id="lbNextUnrated" class="tiny" title="U">next unrated</button>
+            <label class="check small" title="selecting a row while playing switches playback"><input type="checkbox" id="lbAutoPlay" checked> follow</label>
+            <span id="lbRatingHint" class="muted small"></span>
+            <button type="button" id="lbSetA" title="Use this loop as A">Set A</button><button type="button" id="lbSetB" title="Use this loop as B">Set B</button>
+            <button type="button" id="lbRemoveLoop" class="danger tiny" title="Remove from session">remove</button>
+            <button type="button" id="lbReanalyze" class="tiny" title="Re-run detection on every linked loop">re-analyse all</button>
+          </div>
+          <textarea id="lbNotes" rows="2" placeholder="notes (⌘⏎ saves)"></textarea>
+        </form>
+        <div class="row small"><label class="check"><input type="checkbox" id="lbZoomJoin"> zoom join (±60 ms)</label> <label class="check">compare layer <select id="lbCompareLayer"></select></label></div>
+        <canvas id="lbWave" class="lab-wave" aria-label="Loop waveform with hit markers"></canvas>
+        <canvas id="lbHitmap" class="lab-hitmap" aria-label="Hit map"></canvas>
+        <nav class="tabs lab-tabs" role="tablist">
+          <button role="tab" data-tab="metrics" class="active" aria-selected="true">Metrics</button><button role="tab" data-tab="signature" aria-selected="false">Signature</button><button role="tab" data-tab="ab" aria-selected="false">A/B</button><button role="tab" data-tab="layers" aria-selected="false">Layers</button><button role="tab" data-tab="join" aria-selected="false">Join</button><button role="tab" data-tab="compare" aria-selected="false">Compare</button>
+        </nav>
+        <div class="lab-panels">
+          <div class="panel" id="lbTab-metrics" role="tabpanel"><p id="lbMachineCaption" class="muted small">0–10 from how close kick and snare sit to this session's median. Core positions are kick on 1 and 3 and snare on 2 and the a of 3, then penalties for flams, dynamics, and missing hits. This is a summary of that grid. While the number is hidden, the waveform marks stay.</p></div>
+          <div class="panel" id="lbTab-signature" role="tabpanel" hidden></div>
+          <div class="panel" id="lbTab-ab" role="tabpanel" hidden></div>
+          <div class="panel" id="lbTab-layers" role="tabpanel" hidden></div>
+          <div class="panel" id="lbTab-join" role="tabpanel" hidden></div>
+          <div class="panel" id="lbTab-compare" role="tabpanel" hidden></div>
+        </div>
+      </div>
+      <div id="lbTooltip" class="tooltip" hidden></div>
+      <div id="lbHitMenu" class="hit-menu" hidden>
+        <div id="lbHitMenuTitle" class="small"></div>
+        <div class="row"><span class="small muted">class:</span><button data-action="class" data-value="tight" class="tiny">tight</button><button data-action="class" data-value="feel" class="tiny">feel</button><button data-action="class" data-value="mistake" class="tiny">mistake</button><button data-action="class" data-value="extra" class="tiny">extra</button><button data-action="class" data-value="ignore" class="tiny">ignore</button><button data-action="clear" class="tiny">auto</button></div>
+        <div class="row"><span class="small muted">drum:</span><button data-action="drum" data-value="kick" class="tiny">kick</button><button data-action="drum" data-value="snare" class="tiny">snare</button><button data-action="drum" data-value="hat" class="tiny">hat</button><button data-action="drum" data-value="other" class="tiny">other</button></div>
+        <div class="row"><input type="text" id="lbHitReason" placeholder="reason (one line)" style="flex:1"><button data-action="close" class="tiny">close</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-body seq-body" id="seqBody" hidden>
+    <div class="seq-side">
+      <div class="seq-arrs">
+        <div class="row"><b class="small">Arrangements</b><button id="sqNew" class="tiny">new</button><button id="sqDup" class="tiny">duplicate</button><button id="sqRename" class="tiny">rename</button><button id="sqDelete" class="tiny danger">delete</button></div>
+        <div id="sqArrList" class="seq-arr-list"></div>
+        <div class="row small"><button id="sqSetA" class="tiny">set as A</button><button id="sqSetB" class="tiny">set as B</button><span id="sqAbInfo" class="muted"></span></div>
+      </div>
+      <div class="seq-loops">
+        <div class="row"><b class="small">Loops</b><input type="search" id="sqLoopFilter" placeholder="filter" style="flex:1"></div>
+        <div id="sqLoopList" class="seq-loop-list"></div>
+        <p class="muted small">Drag a row onto the lane, or press + to append.</p>
+      </div>
+    </div>
+    <div class="seq-main" id="seqMain">
+      <div class="row seq-head">
+        <span id="sqTitle" class="small"><b>—</b></span>
+        <label class="check small"><input type="checkbox" id="sqShowSource"> PT source bars under ruler</label>
+        <label class="small">seam fade <input type="range" id="sqFade" min="0" max="20" step="1" value="0" style="width:70px"><span id="sqFadeVal">0 ms</span></label>
+        <label class="check small"><input type="checkbox" id="sqLevelMatch" checked> level match</label>
+        <button id="sqZoomOut" class="tiny">−</button><button id="sqZoomIn" class="tiny">+</button><button id="sqFit" class="tiny">fit</button>
+        <button id="sqUndo" class="tiny" disabled>undo</button><button id="sqRedo" class="tiny" disabled>redo</button>
+        <span class="sep"></span>
+        <button id="sqExportCues" class="tiny">cue list (.md + .csv)</button><button id="sqRender" class="tiny">render WAV</button><button id="sqExportArr" class="tiny">export arrangement</button><button id="sqImportArr" class="tiny">import…</button>
+      </div>
+      <canvas id="sqRuler" class="seq-ruler" aria-label="Arrangement ruler"></canvas>
+      <canvas id="sqLane" class="seq-lane" tabindex="0" aria-label="Arrangement lane"></canvas>
+      <canvas id="sqMapping" class="seq-mapping" aria-label="Pro Tools source bar mapping"></canvas>
+      <nav class="tabs lab-tabs seq-tabs" role="tablist">
+        <button role="tab" data-tab="block" class="active" aria-selected="true">Block</button><button role="tab" data-tab="seams" aria-selected="false">Seams <span id="sqSeamCount" class="count"></span></button><button role="tab" data-tab="profile" aria-selected="false">Profile</button><button role="tab" data-tab="cues" aria-selected="false">Cues</button><button role="tab" data-tab="notes" aria-selected="false">Notes</button>
+      </nav>
+      <div class="lab-panels seq-panels">
+        <div class="panel" id="sqTab-block" role="tabpanel">
+          <div id="sqBlockEmpty" class="muted small">Select a block on the lane.</div>
+          <form id="sqBlockForm" class="row" hidden autocomplete="off">
+            <span id="sqBlockTitle"><b>—</b></span>
+            <label class="small">repeats <button type="button" id="sqRepMinus" class="tiny">−</button><input type="number" id="sqRepeats" min="1" max="64" value="1" style="width:56px"><button type="button" id="sqRepPlus" class="tiny">+</button></label>
+            <label class="small">trim <input type="range" id="sqGain" min="-12" max="12" step="0.5" value="0" style="width:100px"><input type="number" id="sqGainNum" min="-12" max="12" step="0.5" value="0" style="width:64px"> dB</label>
+            <label class="small">notes <input type="text" id="sqBlockNotes" placeholder="light hats" style="width:180px"></label>
+            <button type="button" id="sqBlockDup" class="tiny">duplicate ⌘D</button><button type="button" id="sqBlockDel" class="tiny danger">remove ⌫</button>
+            <span id="sqBlockInfo" class="muted small"></span>
+          </form>
+        </div>
+        <div class="panel" id="sqTab-seams" role="tabpanel" hidden></div>
+        <div class="panel" id="sqTab-profile" role="tabpanel" hidden><canvas id="sqProfile" class="seq-profile"></canvas><div id="sqOverview" class="small"></div></div>
+        <div class="panel" id="sqTab-cues" role="tabpanel" hidden></div>
+        <div class="panel" id="sqTab-notes" role="tabpanel" hidden><textarea id="sqNotes" rows="4" placeholder="arrangement notes (saved in loops.json and printed on the cue list)"></textarea></div>
+      </div>
+      <div id="sqTooltip" class="tooltip" hidden></div>
+    </div>
+  </div>
+  <div class="seq-transport" id="seqTransport" role="group" aria-label="Sequence transport" hidden>
+    <button id="sqPlay" class="play" title="Play arrangement from the start (Space)">▶</button>
+    <button id="sqPlayFrom" title="Play from the selected block (⇧Space)">▶ block</button>
+    <button id="sqLoopAll" title="Loop the whole arrangement">loop all</button>
+    <button id="sqLoopBlock" title="Loop the selected block (its repeats)">loop block</button>
+    <button id="sqSeam" title="Seam audition: last bar → first bar on repeat (J)">seam J</button>
+    <button id="sqStop" title="Stop">■</button>
+    <span id="sqPos" class="time">—</span><span id="sqPosPt" class="muted small"></span>
+  </div>
+  <div class="lab-transport" role="group" aria-label="Loop transport">
+    <button id="lbPlay" class="play" title="Play / pause (Space)" aria-pressed="false">▶</button>
+    <button id="lbStop" title="Stop">■</button>
+    <span id="lbMode" class="muted small">stopped</span>
+    <span id="lbPos" class="time">—</span><span id="lbBar" class="muted small"></span>
+    <span id="lbBeat" class="beat-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <label class="small" title="R cycles; pitch follows rate">rate <select id="lbRate"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option></select> <span class="muted">pitch follows rate</span></label>
+    <span class="sep"></span>
+    <button id="lbDeckA" title="Audition A (A)">A</button><button id="lbDeckB" title="Audition B (B)">B</button><button id="lbSwap" title="Swap (X)">⇄</button>
+    <label class="check small"><input type="checkbox" id="lbAtBar" checked> at next bar</label>
+    <label class="check small"><input type="checkbox" id="lbBlind"> blind</label><button id="lbReveal" class="tiny" hidden>Reveal</button>
+    <label class="check small" title="Normalise A and B to equal integrated RMS (L)"><input type="checkbox" id="lbLevelMatch" checked> level match</label>
+    <span class="sep"></span>
+    <button id="lbJoin" title="Loop the join: last beat → first beat (J)">Join</button>
+    <label class="small" title="Raised-cosine fade at each end; loop length unchanged">fade <input type="range" id="lbFade" min="0" max="20" step="1" value="0" style="width:70px"><span id="lbFadeVal">0 ms</span></label>
+    <span class="sep"></span>
+    <label class="check small"><input type="checkbox" id="lbMetroOn"> click <kbd>C</kbd></label>
+    <label class="small"><input type="range" id="lbMetroLevel" min="-40" max="0" step="1" value="-12" style="width:80px" title="metronome level (, and .)"><span id="lbMetroLevelVal">-12 dB</span></label>
+    <select id="lbMetroSound" title="sound"><option value="click">click</option><option value="wood">wood</option><option value="blip">blip</option></select>
+    <select id="lbMetroPan" title="pan"><option value="0">centre</option><option value="-1">left</option><option value="1">right</option></select>
+    <select id="lbMetroSub" title="subdivision"><option value="0">beats</option><option value="2">8ths</option><option value="4">16ths</option></select>
+    <label class="check small"><input type="checkbox" id="lbMetroAccent" checked> accent</label>
+    <label class="check small"><input type="checkbox" id="lbMetroCountIn"> count-in</label>
+  </div>
+</section>
+
+<dialog id="dlgLabHelp" aria-label="Loop Lab shortcuts">
+  <h3>Loop Lab shortcuts</h3>
+  <div class="shortcuts">
+    <div><kbd>Space</kbd> play / pause</div><div><kbd>0</kbd>–<kbd>9</kbd> ×2: type the rating (e.g. 8 3 = 8.3)</div>
+    <div><kbd>Enter</kbd> commit the rating and jump to the next unrated loop</div><div><kbd>N</kbd> / <kbd>P</kbd> next / previous · <kbd>[</kbd> <kbd>]</kbd> too</div>
+    <div><kbd>U</kbd> next unrated · <kbd>S</kbd> skip (marked, not rated)</div><div><kbd>T</kbd> focus the note · <kbd>R</kbd> set the selected loop as similarity reference</div>
+    <div><kbd>C</kbd> A/B against the reference · <kbd>V</kbd> against the previously rated loop</div><div><kbd>A</kbd> <kbd>B</kbd> audition A / B · <kbd>X</kbd> swap</div>
+    <div><kbd>J</kbd> play the join (last beat → first beat)</div><div><kbd>M</kbd> metronome on/off · <kbd>,</kbd> <kbd>.</kbd> level ±3 dB</div>
+    <div><kbd>⇧R</kbd> cycle rate 0.5× / 0.75× / 1× — pitch follows rate</div><div><kbd>L</kbd> level match on/off · <kbd>⌘E</kbd> export my ratings</div>
+    <div><kbd>Esc</kbd> close hit menu / clear typed digits</div><div>Reveal (toolbar): Hidden · After I rate · All — always Hidden at launch</div>
+    <div><kbd>⌘S</kbd> save loops.json · <kbd>⌘O</kbd> open loops · <kbd>⇧⌘O</kbd> load loops.json</div><div><kbd>?</kbd> this sheet</div>
+    <div>Click a hit marker or hit-map cell: override its class, correct its drum.</div><div>Colours + shapes: ● tight, ◆ feel, ■ extra, × mistake, ○ missing.</div>
+  </div>
+  <h4>Sequence view</h4>
+  <div class="shortcuts">
+    <div><kbd>Space</kbd> play from start · <kbd>⇧Space</kbd> from selected block</div><div><kbd>J</kbd> seam audition (selected seam, or the seam after the selected block)</div>
+    <div><kbd>←</kbd> <kbd>→</kbd> select block · <kbd>⌥←</kbd> <kbd>⌥→</kbd> move it</div><div><kbd>↑</kbd> <kbd>↓</kbd> repeat count · <kbd>⌘D</kbd> duplicate · <kbd>⌫</kbd> remove</div>
+    <div><kbd>+</kbd> <kbd>−</kbd> <kbd>0</kbd> zoom / fit · wheel scrolls, ⌘-wheel zooms</div><div><kbd>A</kbd> <kbd>B</kbd> <kbd>X</kbd> A/B arrangements at the next bar · <kbd>C</kbd> click · <kbd>R</kbd> rate · <kbd>⌘Z</kbd> undo</div>
+    <div>Drag a loop row onto the lane; drag a block to reorder; drag it above/below the lane to remove.</div><div>Double-click the ruler: add a marker; click a marker: rename; ⌥-click: remove.</div>
+  </div>
+  <form method="dialog"><button class="primary">Close</button></form>
+</dialog>
+
+<dialog id="dlgLabSettings" aria-label="Analysis settings">
+  <h3>Analysis settings</h3>
+  <div class="grid3">
+    <label>tight ≤ ms <input type="number" id="ls_tightMs" step="0.5" min="0"></label>
+    <label>feel ≤ ms <input type="number" id="ls_feelMs" step="0.5" min="0"></label>
+    <label>flam &lt; ms <input type="number" id="ls_flamMs" step="1" min="0"></label>
+    <label>dynamics ± dB <input type="number" id="ls_dynamicsDb" step="0.5" min="0"></label>
+    <label>far &gt; ms <input type="number" id="ls_farMs" step="1" min="0"></label>
+    <label>expected ≥ % of bars <input type="number" id="ls_expectedShare" step="5" min="0" max="100"></label>
+  </div>
+  <label>Core hits (drum: 16th positions, 0–15) <textarea id="ls_core" rows="3"></textarea></label>
+  <h4>Band floors (dB, blank = automatic valley)</h4>
+  <div class="grid3"><label>low <input type="number" id="ls_floor_low" step="1"></label><label>mid <input type="number" id="ls_floor_mid" step="1"></label><label>high <input type="number" id="ls_floor_high" step="1"></label></div>
+  <div id="lsFloorsAuto" class="muted small"></div>
+  <p class="muted small">Changing flam or floors re-runs detection; other thresholds re-classify instantly.</p>
+  <div class="row end"><button type="button" id="lsCancel">Cancel</button><button type="button" id="lsSave" class="primary">Save</button></div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="dropOverlay" class="drop-overlay" hidden>Drop a .wav or .notes.json</div>
+
+<dialog id="dlgHelp" aria-label="Keyboard shortcuts">
+  <h3>Keyboard shortcuts</h3>
+  <div class="shortcuts">
+    <div><kbd>Space</kbd> play / pause</div><div><kbd>Enter</kbd> stop and return (or save in the editor)</div>
+    <div><kbd>Esc</kbd> cancel editor / clear selection</div><div><kbd>Home</kbd> jump to start</div>
+    <div><kbd>←</kbd> <kbd>→</kbd> nudge ±1 s (<kbd>⇧</kbd> ±10 s)</div><div><kbd>[</kbd> <kbd>]</kbd> previous / next note</div>
+    <div><kbd>M</kbd> pin at playhead (<kbd>⌥M</kbd> at mouse)</div><div><kbd>I</kbd> <kbd>O</kbd> selection in / out</div>
+    <div><kbd>⇧M</kbd> interval from selection</div><div><kbd>L</kbd> loop selection / note</div>
+    <div><kbd>S</kbd> toggle snap</div><div><kbd>G</kbd> toggle grid lines</div>
+    <div><kbd>+</kbd> <kbd>−</kbd> zoom, <kbd>0</kbd> fit, <kbd>F</kbd> centre on playhead</div><div><kbd>N</kbd> next open note</div>
+    <div><kbd>A</kbd> analysis overlay</div><div><kbd>⌫</kbd> delete selected note</div>
+    <div><kbd>⌘S</kbd> save · <kbd>⌘O</kbd> open WAV · <kbd>⇧⌘O</kbd> load notes</div><div><kbd>⌘Z</kbd> undo · <kbd>⇧⌘Z</kbd> redo</div>
+    <div><kbd>?</kbd> this sheet</div><div>Double-click waveform: new pin · <kbd>⇧</kbd>-drag: select · wheel: zoom · ⇧-wheel / drag: pan</div>
+  </div>
+  <form method="dialog"><button class="primary">Close</button></form>
+</dialog>
+
+<dialog id="dlgSettings" aria-label="Settings">
+  <h3>Settings</h3>
+  <label>Categories (one per line, optional colour after a comma)<textarea id="setCategories" rows="6"></textarea></label>
+  <div data-bounce-feature="ai"><h4>AI (direct requests)</h4>
+  <label>Anthropic API key <input type="password" id="setApiKey" placeholder="sk-ant-…" autocomplete="off"></label>
+  <label>Model <input type="text" id="setModel" placeholder="type a model name" autocomplete="off"></label>
+  <p class="muted small">Type the model name yourself. An empty model is not sent. The key is kept only in this browser's localStorage and is never written to the notes JSON.</p></div>
+  <div class="row"><button type="button" id="setForgetKey">Forget key</button><button type="button" id="setClearCache">Clear peak cache</button><button type="button" id="setClearAutosave">Clear autosaves</button></div>
+  <div id="setCacheInfo" class="muted small"></div>
+  <div class="row end"><button type="button" id="setCancel">Cancel</button><button type="button" id="setSave" class="primary">Save settings</button></div>
+</dialog>
+
+<dialog id="dlgConfirm" aria-label="Confirm">
+  <h3 id="cfTitle"></h3>
+  <div id="cfBody" class="cf-body"></div>
+  <div class="row end" id="cfButtons"></div>
+</dialog>
+
+<dialog id="dlgRelink" aria-label="Re-link notes to a new WAV">
+  <h3>Re-link notes to a new WAV</h3>
+  <p class="muted small">Opens another bounce while keeping every layer and note. Optionally shift all notes by a time offset (positive moves them later).</p>
+  <label>Offset in seconds <input type="text" id="rlSeconds" value="0" inputmode="decimal"></label>
+  <label>…or in bars (uses the current grid) <input type="text" id="rlBars" value="" inputmode="decimal" placeholder="e.g. 2 or -1"></label>
+  <div class="row end"><button type="button" id="rlCancel">Cancel</button><button type="button" id="rlChoose" class="primary">Choose WAV…</button></div>
+</dialog>
+
+<audio id="audio" preload="auto"></audio>
+<input type="file" id="fileWav" accept=".wav,.wave,audio/wav,audio/x-wav,audio/*" hidden>
+<input type="file" id="fileJson" accept=".json,application/json" hidden>
+<input type="file" id="fileAi" accept=".json,application/json,.txt,.md" hidden>
+<input type="file" id="lbFiles" accept=".wav,.wave,audio/wav" multiple hidden>
+<input type="file" id="lbJson" accept=".json,application/json" hidden>
+<input type="file" id="lbSidecar" accept=".json,application/json" hidden>
+<input type="file" id="sqArrFile" accept=".json,application/json" hidden>
+<input type="file" id="lbRatingsFile" accept=".json,application/json" hidden>
+
+<script src="js/util.js"></script>
+<script src="js/schema.js"></script>
+<script src="js/validate.js"></script>
+<script src="js/wav.js"></script>
+<script src="js/worker.js"></script>
+<script src="js/peaks.js"></script>
+<script src="js/grid.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/waveform.js"></script>
+<script src="js/transport.js"></script>
+<script src="js/persistence.js"></script>
+<script src="js/exports.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/loopsSchema.js"></script>
+<script src="js/onsets.js"></script>
+<script src="js/loops.js"></script>
+<script src="js/loopplayer.js"></script>
+<script src="js/library.js"></script>
+<script src="js/ranking.js"></script>
+<script src="js/compare.js"></script>
+<script src="js/songstrip.js"></script>
+<script src="js/sequence.js"></script>
+<script src="js/sequenceview.js"></script>
+<script src="js/looplab.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

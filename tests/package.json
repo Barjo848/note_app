@@ -1,0 +1,12 @@
+{
+  "name": "note-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playwright acceptance tests for Note (dev-only; the app itself has no dependencies)",
+  "scripts": {
+    "test": "node run_tests.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

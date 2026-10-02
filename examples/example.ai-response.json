@@ -1,0 +1,15 @@
+{
+  "layerName": "AI v2",
+  "summary": "The take is a steady 108 BPM groove with a clear eight-bar cycle: onsets cluster on every bar line and a noise burst opens every eighth bar. Energy is flat apart from a four-bar quiet passage around bar 46 and again around bar 104, which read like natural dub drop-outs. The biggest opportunities are to commit to those drop-outs as arrangement moves and to tighten the loud/quiet contrast, which is currently only about 14 dB. I cannot hear the audio, so timing comments come from the descriptor table and from the notes.",
+  "replies": [
+    { "toNoteId": "n_example_fill", "body": "Agree. The onset count in bar 41 is the highest in the table, so this fill is also the busiest moment rhythmically; keep it and consider muting the bass under it for one beat." },
+    { "toNoteId": "n_example_loop", "body": "Bars 64–81 have the most consistent RMS in the song (within 1 dB), which supports this as the loop. If you need exactly eight bars, 64|1 to 72|1 has no burst inside it." }
+  ],
+  "notes": [
+    { "type": "pin", "startSeconds": 60.0, "title": "bar 28 hit", "body": "Bar line at exactly 60.000 s; a good edit point if the intro is trimmed to 27 bars.", "category": "structure", "confidence": "high" },
+    { "type": "interval", "startSeconds": 100.0, "endSeconds": 110.0, "title": "drop-out 1", "body": "RMS falls by roughly 14 dB for these bars. Make it deliberate: pull everything but the bass and add a spring send on the last snare before it.", "category": "idea", "confidence": "medium" },
+    { "type": "interval", "startSeconds": 228.0, "endSeconds": 238.0, "title": "drop-out 2", "body": "Second quiet passage; mirror whatever treatment drop-out 1 gets so the form feels intentional.", "category": "structure", "confidence": "medium" },
+    { "type": "pin", "startSeconds": 17.78, "title": "first burst", "body": "The first noise burst lands at bar 9. If it is a crash or FX hit, the low band barely moves, so it is not masking the bass. I am guessing at what the sound is.", "category": "fx", "confidence": "low" },
+    { "type": "interval", "startSeconds": 0.0, "endSeconds": 17.78, "title": "intro: 8 bars", "body": "Nothing but the pulse before the first burst. Eight bars of intro is long for a dub demo; consider four.", "category": "structure", "confidence": "medium" }
+  ]
+}

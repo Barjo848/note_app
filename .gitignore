@@ -1,0 +1,22 @@
+node_modules/
+tests/node_modules/
+tests/fixtures/*.wav
+tests/fixtures/**/*.wav
+tests/.pw-browsers/
+tests/test-results/
+tests/screenshots/
+.DS_Store
+# loop libraries: WAV audio and a synced library directory stay on disk and out of the snapshot
+library/**/*.wav
+library/**/*.WAV
+library/**/*.tmp
+library/*/
+tests/fixtures/library/
+.claude/
+dist/
+hosted/
+js/hosts.js
+tools/build_hosted.py
+examples/example.*-ratings.json
+examples/example.backbone-v1.cues.md
+.private/

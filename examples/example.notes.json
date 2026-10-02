@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "app": { "name": "Note", "version": "1.0.0" },
+  "track": {
+    "fileName": "synth_10min_48k_st24.wav",
+    "fingerprint": "4a7a048c65fa7c76b09584f6a51a686c28ddc9eead55a8f8bfd4bccf17791122",
+    "sizeBytes": 172800044,
+    "durationSeconds": 600,
+    "sampleRate": 48000,
+    "channels": 2,
+    "bitDepth": 24,
+    "format": "pcm"
+  },
+  "grid": { "bpm": 108, "meterNumerator": 4, "meterDenominator": 4, "bar1OffsetSeconds": 0, "ticksPerQuarter": 960 },
+  "settings": {
+    "categories": ["structure", "drums", "bass", "mix", "fx", "idea", "fix", "loop", "fill", "reference"],
+    "snap": "bar"
+  },
+  "layers": [
+    { "id": "L1", "name": "Notes", "kind": "human", "color": "#3fb0ff", "visible": true, "createdAt": "2026-09-13T02:00:00Z" },
+    { "id": "L2", "name": "AI v1", "kind": "ai", "color": "#ffb03f", "visible": true, "createdAt": "2026-09-13T02:30:00Z",
+      "summary": "Example AI layer kept from an earlier round; see example.ai-response.json for the raw response format.",
+      "source": { "model": "example-model", "requestId": "msg_example" } }
+  ],
+  "notes": [
+    {
+      "id": "n_example_fill", "layerId": "L1", "type": "pin",
+      "start": { "samples": 4266672, "seconds": 88.889 }, "end": null,
+      "title": "big fill", "body": "6 tom hits, keep this one", "category": "fill", "tags": ["keep"],
+      "color": null, "rating": 5, "status": "open",
+      "createdAt": "2026-09-13T02:01:00Z", "updatedAt": "2026-09-13T02:01:00Z",
+      "replies": [
+        { "id": "r_example_1", "layerId": "L2", "body": "Agree; the onset count spikes here and it lands on the bar line at 41|1|000.", "createdAt": "2026-09-13T02:30:00Z" }
+      ],
+      "studioNote": "unknown fields like this one survive a round trip"
+    },
+    {
+      "id": "n_example_loop", "layerId": "L1", "type": "interval",
+      "start": { "samples": 6720000, "seconds": 140.0 }, "end": { "samples": 8640000, "seconds": 180.0 },
+      "title": "loop candidate 8 bars", "body": "64|1 to 82|1 — tightest stretch of the take", "category": "loop", "tags": [],
+      "color": null, "rating": 4, "status": "open",
+      "createdAt": "2026-09-13T02:02:00Z", "updatedAt": "2026-09-13T02:02:00Z", "replies": []
+    },
+    {
+      "id": "n_example_kick", "layerId": "L1", "type": "pin",
+      "start": { "samples": 1440000, "seconds": 30.0 }, "end": null,
+      "title": "kick too loud", "body": "pull the kick 1.5 dB from here until the breakdown", "category": "mix", "tags": ["todo"],
+      "color": null, "rating": null, "status": "done",
+      "createdAt": "2026-09-13T02:03:00Z", "updatedAt": "2026-09-13T02:10:00Z", "replies": []
+    },
+    {
+      "id": "n_example_ai_quiet", "layerId": "L2", "type": "interval",
+      "start": { "samples": 4800000, "seconds": 100.0 }, "end": { "samples": 5280000, "seconds": 110.0 },
+      "title": "quiet passage", "body": "RMS drops about 14 dB for four bars; a candidate dub drop-out.", "category": "structure", "tags": ["ai:confidence=medium"],
+      "color": null, "rating": null, "status": "open",
+      "createdAt": "2026-09-13T02:30:00Z", "updatedAt": "2026-09-13T02:30:00Z", "replies": []
+    }
+  ],
+  "history": [
+    { "at": "2026-09-13T02:20:00Z", "event": "relinked", "from": "synth_10min_v1.wav", "to": "synth_10min_48k_st24.wav", "offsetSeconds": 0 }
+  ]
+}

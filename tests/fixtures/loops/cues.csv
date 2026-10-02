@@ -1,0 +1,9 @@
+arr_start_bar,arr_end_bar,loop,pt_bars,pt_start,pt_end,repeat,trim_db,match_db,seam_in,seam_severity,start_seconds,length_seconds,notes
+1,2,tight,83–84,83|1|000,85|1|000,1/2,0.0,0.0,start,,0.000000,4.444438,
+3,4,tight,83–84,83|1|000,85|1|000,2/2,0.0,0.0,clean,green,4.444438,4.444438,
+5,6,quiet,301–304,301|1|000,305|1|000,1/1,-1.5,0.0,watch level,red,8.888875,4.444438,
+7,8,tight,83–84,83|1|000,85|1|000,1/1,0.0,0.0,watch level,red,13.333313,4.444438,
+
+care_list
+"Bar 5 (tight → quiet, red): level drops 7.5 dB — trim the incoming loop 7.5 dB or ride the fader"
+"Bar 7 (quiet → tight, red): level jumps up 7.5 dB — trim the incoming loop -7.5 dB or ride the fader"

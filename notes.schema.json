@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local/note/notes.schema.json",
+  "title": "Note notes document",
+  "description": "Notes, layers, tempo grid and history for one audio bounce. Unknown fields are permitted everywhere and preserved on round trip.",
+  "type": "object",
+  "required": ["schemaVersion", "track", "layers", "notes"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "app": { "type": "object", "properties": { "name": { "type": "string" }, "version": { "type": "string" } } },
+    "track": {
+      "type": "object",
+      "required": ["fileName", "fingerprint", "sampleRate", "durationSeconds"],
+      "properties": {
+        "fileName": { "type": "string" },
+        "fingerprint": { "type": "string", "minLength": 8 },
+        "sizeBytes": { "type": "integer", "minimum": 0 },
+        "durationSeconds": { "type": "number", "minimum": 0 },
+        "sampleRate": { "type": "number", "exclusiveMinimum": 0 },
+        "channels": { "type": "integer", "minimum": 1 },
+        "bitDepth": { "type": "integer", "minimum": 1 },
+        "format": { "type": "string" }
+      }
+    },
+    "grid": { "$ref": "#/$defs/grid" },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "categories": { "type": "array", "items": { "type": "string" } },
+        "categoryColors": { "type": "object", "additionalProperties": { "type": "string" } },
+        "snap": { "type": "string", "enum": ["off", "bar", "beat", "8th", "16th"] }
+      }
+    },
+    "layers": { "type": "array", "items": { "$ref": "#/$defs/layer" } },
+    "notes": { "type": "array", "items": { "$ref": "#/$defs/note" } },
+    "history": { "type": "array", "items": { "$ref": "#/$defs/historyEvent" } }
+  },
+  "$defs": {
+    "position": {
+      "type": "object",
+      "required": ["samples"],
+      "properties": {
+        "samples": { "type": "integer", "minimum": 0 },
+        "seconds": { "type": "number", "minimum": 0 }
+      }
+    },
+    "grid": {
+      "type": "object",
+      "properties": {
+        "bpm": { "type": "number", "exclusiveMinimum": 0 },
+        "meterNumerator": { "type": "integer", "minimum": 1 },
+        "meterDenominator": { "type": "integer", "enum": [1, 2, 4, 8, 16, 32] },
+        "bar1OffsetSeconds": { "type": "number" },
+        "ticksPerQuarter": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["human", "ai", "imported"] },
+        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "visible": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "summary": { "type": ["string", "null"] },
+        "source": { "type": "object", "properties": { "model": { "type": "string" }, "requestId": { "type": "string" } } }
+      }
+    },
+    "reply": {
+      "type": "object",
+      "required": ["id", "layerId", "body"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "layerId": { "type": "string", "minLength": 1 },
+        "body": { "type": "string" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "note": {
+      "type": "object",
+      "required": ["id", "layerId", "type", "start"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "layerId": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "enum": ["pin", "interval"] },
+        "start": { "$ref": "#/$defs/position" },
+        "end": { "anyOf": [{ "$ref": "#/$defs/position" }, { "type": "null" }] },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "color": { "type": ["string", "null"] },
+        "rating": { "anyOf": [{ "type": "integer", "minimum": 1, "maximum": 5 }, { "type": "null" }] },
+        "status": { "type": "string", "enum": ["open", "done", "wontfix"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "replies": { "type": "array", "items": { "$ref": "#/$defs/reply" } }
+      }
+    },
+    "historyEvent": {
+      "type": "object",
+      "required": ["at", "event"],
+      "properties": {
+        "at": { "type": "string" },
+        "event": { "type": "string" }
+      }
+    },
+    "aiResponse": {
+      "type": "object",
+      "required": ["notes"],
+      "properties": {
+        "layerName": { "type": "string" },
+        "summary": { "type": "string" },
+        "replies": { "type": "array", "items": { "$ref": "#/$defs/aiReply" } },
+        "notes": { "type": "array", "items": { "$ref": "#/$defs/aiNote" } }
+      }
+    },
+    "aiReply": {
+      "type": "object",
+      "required": ["toNoteId", "body"],
+      "properties": {
+        "toNoteId": { "type": "string", "minLength": 1 },
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "aiNote": {
+      "type": "object",
+      "required": ["type", "startSeconds", "title"],
+      "properties": {
+        "type": { "type": "string", "enum": ["pin", "interval"] },
+        "startSeconds": { "type": "number", "minimum": 0 },
+        "endSeconds": { "type": "number", "minimum": 0 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "body": { "type": "string" },
+        "category": { "type": "string" },
+        "confidence": { "type": "string", "enum": ["low", "medium", "high"] }
+      }
+    }
+  }
+}
