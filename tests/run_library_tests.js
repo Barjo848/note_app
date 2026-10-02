@@ -111,7 +111,8 @@ async function main() {
     const ex1 = await lab(async () => { const L = window.app.loopLab; const o = L.persist.exportText; L.persist.exportText = async () => ({ name: 'x' }); const ex = await L.exportRatings(); L.persist.exportText = o; return ex; });
     assert(ex1.comparison === null && ex1.ratings.length === 3 && ex1.unrated.length === 3 && ex1.summary.rated === 3 && ex1.summary.skipped === 1 && ex1.summary.byLength['8'].rated === 1, 'hidden export: no comparison: ' + JSON.stringify(ex1.summary));
     const errs = await lab((ex) => validateSchema(LOOPS_SCHEMA.$defs.ratingsExport, ex, LOOPS_SCHEMA), ex1); assert(errs.length === 0, 'schema valid: ' + JSON.stringify(errs));
-    assert(!JSON.stringify(ex1).includes('Fake intro run') && !JSON.stringify(ex1).includes('9.6'), "Claude's values never in the file while hidden");
+    const hidden = Object.assign({}, ex1); delete hidden.exportedAt;
+    assert(!JSON.stringify(hidden).includes('Fake intro run') && !JSON.stringify(hidden).includes('9.6'), 'imported values stay out of the file while hidden');
     const onDisk = JSON.parse(fs.readFileSync(path.join(FIXLIB, 'fake-drums', 'fake-drums.ratings.json'), 'utf8')); assert(onDisk.ratings.length === 3, 'written to the library folder through the endpoint');
     const csv = await lab((ex) => LibraryLoader.ratingsCsv(ex), ex1); const rows = csv.split('\n').filter(l => /^\d/.test(l) || /^[0-9-]+,/.test(l)); assert(rows.length === 3 && csv.includes('9-16,8 bar loops/9-16.wav,8,9,17,8.3,,backbone,a,') && csv.includes('unrated,33-34 33-36 324'), 'csv agrees: ' + rows[0]);
     await page.selectOption('#lbRevealMode', 'all'); await page.check('#lbIncludeCmp');
